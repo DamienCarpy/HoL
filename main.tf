@@ -1,12 +1,12 @@
-# Définition du fournisseur AWS
+# Declare AWS provider
 provider "aws" {
   region = var.aws_region
 }
 
-# Récupération de la session utilisateur
+# Get user identity & environment
 data "aws_caller_identity" "current" {}
 
-# Définition de la politique
+# Define policy
 data "aws_iam_policy_document" "students" {
   statement {
     actions = [
@@ -70,46 +70,50 @@ data "aws_iam_policy_document" "students" {
   }
 }
 
-# Déclaration de la politique
+# Declare policy
 resource "aws_iam_policy" "students" {
   name        = "students_policy"
   description = "students policy"
   policy      = data.aws_iam_policy_document.students.json
 }
 
-# Création d'un groupe IAM pour les utilisateurs
+# Create an IAM group for users
 resource "aws_iam_group" "students" {
-  name = "students"
+  name = var.group
 }
 
-# Attachement de la politique au groupe
+# Attach policy to group
 resource "aws_iam_group_policy_attachment" "students" {
   group      = aws_iam_group.students.name
   policy_arn = aws_iam_policy.students.arn
 }
 
-# Création des utilisateurs
+# Create users
 resource "aws_iam_user" "called" {
   for_each = toset(var.users)
   name     = each.key
 }
 
+# Add each user to group
 resource "aws_iam_user_group_membership" "student" {
   for_each = toset(var.users)
   user     = aws_iam_user.called[each.key].name
   groups   = [aws_iam_group.students.name]
 }
 
+# Generate programmatic key for each student
 resource "aws_iam_access_key" "student" {
   for_each = toset(var.users)
   user     = aws_iam_user.called[each.key].name
 }
 
+# Generate web console password for each student
 resource "aws_iam_user_login_profile" "student" {
   for_each = toset(var.users)
   user     = aws_iam_user.called[each.key].name
 }
 
+# Store programmatic key in SSM with user as name and key ID as description
 resource "aws_ssm_parameter" "student_secret_CLI" {
   for_each    = toset(var.users)
   name        = "${aws_iam_user.called[each.key].name}_CLI"
@@ -118,6 +122,7 @@ resource "aws_ssm_parameter" "student_secret_CLI" {
   type        = "SecureString"
 }
 
+# Store web console password in SSM with user as name and key ID as description
 resource "aws_ssm_parameter" "student_secret_GUI" {
   for_each    = toset(var.users)
   name        = "${aws_iam_user.called[each.key].name}_GUI"
