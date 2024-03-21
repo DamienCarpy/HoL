@@ -38,6 +38,7 @@ data "aws_iam_policy_document" "students" {
       "ec2:DeleteVpc",
       "ec2:CreateSubnet",
       "ec2:AssociateAddress",
+      "ec2:CreateSecurityGroup",
       "ec2:DescribeMovingAddresses",
       "ec2:DescribeAddresses",
       "ec2:DescribeInstances",
