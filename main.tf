@@ -57,8 +57,13 @@ data "aws_iam_policy_document" "students" {
       "ec2:RunInstances",
       "ec2:TerminateInstances",
       "ec2:ModifyInstanceAttribute",
-      "ec2:AssociateAddress"
-      ]
+      "ec2:AssociateAddress",
+      "ec2:ImportKeyPair",
+      "ec2:DescribeKeyPairs",
+      "ec2:DeleteKeyPair",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeInstanceCreditSpecifications"
+    ]
     effect    = "Allow"
     resources = ["arn:aws:ec2:*:${data.aws_caller_identity.current.id}:*"]
 
