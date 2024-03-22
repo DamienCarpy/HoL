@@ -70,7 +70,12 @@ data "aws_iam_policy_document" "students" {
       "ec2:DescribeEgressOnlyInternetGateways",
       "ec2:DescribeVpcEndpoints",
       "iam:PassRole",
-      "ssm:GetParameters"
+      "ssm:GetParameters",
+      "ec2:ImportKeyPair",
+      "ec2:DescribeKeyPairs",
+      "ec2:DeleteKeyPair",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeInstanceCreditSpecifications"
     ]
     effect    = "Allow"
     resources = ["*"]
